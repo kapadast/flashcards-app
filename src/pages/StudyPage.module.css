@@ -1,0 +1,129 @@
+.page {
+  padding: 1rem 1.25rem 2rem;
+}
+
+.muted {
+  color: #94a3b8;
+  text-align: center;
+}
+
+.counter {
+  text-align: center;
+  color: #64748b;
+  font-size: 0.875rem;
+  margin: 0 0 0.75rem;
+}
+
+.cardWrap {
+  width: 100%;
+  text-align: left;
+  background: none;
+  padding: 0;
+  display: block;
+  cursor: pointer;
+  border-radius: 1.25rem;
+  outline: none;
+}
+
+.cardWrap:focus-visible {
+  box-shadow: 0 0 0 2px #7c3aed;
+}
+
+.card {
+  min-height: 16rem;
+  background: #1a1a24;
+  border: 1px solid #2d2d3d;
+  border-radius: 1.25rem;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.front,
+.back {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 1rem;
+}
+
+.word {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #fff;
+  text-align: center;
+}
+
+.speak {
+  display: inline-block;
+  padding: 0.75rem 1.25rem;
+  background: #2d2640;
+  color: #c4b5fd;
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.speak:focus-visible {
+  outline: 2px solid #a78bfa;
+  outline-offset: 2px;
+}
+
+.hint {
+  font-size: 0.8125rem;
+  color: #475569;
+  margin-top: 0.5rem;
+}
+
+.translation {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #e2e8f0;
+  text-align: center;
+}
+
+.example {
+  font-size: 0.9375rem;
+  color: #94a3b8;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  justify-content: center;
+}
+
+.grade {
+  flex: 1;
+  min-width: 42%;
+  padding: 1rem 0.75rem;
+  border-radius: 0.625rem;
+  font-weight: 700;
+  font-size: 1rem;
+  color: #fff;
+}
+
+.again {
+  background: #7f1d1d;
+}
+
+.good {
+  background: #14532d;
+}
+
+.end {
+  width: 100%;
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: transparent;
+  color: #64748b;
+  font-size: 0.9375rem;
+}

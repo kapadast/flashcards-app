@@ -1,0 +1,297 @@
+.page {
+  padding: 1.5rem 1.25rem 2rem;
+}
+
+.title {
+  margin: 0.5rem 0 0;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.tab {
+  flex: 1;
+  padding: 0.65rem;
+  border-radius: 0.5rem;
+  background: #1a1a24;
+  border: 1px solid #2d2d3d;
+  color: #94a3b8;
+  font-weight: 700;
+  font-size: 0.9375rem;
+}
+
+.tabOn {
+  background: #2d2640;
+  border-color: #7c3aed;
+  color: #e2e8f0;
+}
+
+.addTheme {
+  width: 100%;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  background: #1a1a24;
+  border: 1px dashed #64748b;
+  color: #a78bfa;
+  font-weight: 700;
+}
+
+.catList {
+  list-style: none;
+  margin: 0 0 1rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.catItem {
+  background: #1a1a24;
+  border: 1px solid #2d2d3d;
+  border-radius: 0.75rem;
+  padding: 1rem;
+}
+
+.catHead {
+  margin-bottom: 0.75rem;
+}
+
+.catName {
+  display: block;
+  color: #fff;
+  font-size: 1.05rem;
+}
+
+.catMeta {
+  font-size: 0.8125rem;
+  color: #94a3b8;
+}
+
+.catActions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.primarySm {
+  width: 100%;
+  padding: 0.65rem;
+  border-radius: 0.5rem;
+  background: #7c3aed;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9375rem;
+}
+
+.primarySm:disabled {
+  opacity: 0.45;
+}
+
+.importBtnSm {
+  width: 100%;
+  padding: 0.65rem;
+  border-radius: 0.5rem;
+  background: #1e3a2f;
+  border: 1px solid #2d5a45;
+  color: #86efac;
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
+.input {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #2d2d3d;
+  background: #0f0f14;
+  color: #e2e8f0;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.sub {
+  margin: 0.5rem 0 1.25rem;
+  font-size: 0.875rem;
+  color: #94a3b8;
+}
+
+.card {
+  background: #1a1a24;
+  border: 1px solid #2d2d3d;
+  border-radius: 1rem;
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.label {
+  font-size: 0.8125rem;
+  color: #94a3b8;
+  margin-top: 0.5rem;
+}
+
+.label:first-of-type {
+  margin-top: 0;
+}
+
+.big {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #a78bfa;
+  line-height: 1.1;
+}
+
+.mid {
+  font-size: 1.375rem;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.primary {
+  width: 100%;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  background: #7c3aed;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.0625rem;
+}
+
+.primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.importBtn {
+  width: 100%;
+  margin-top: 0.75rem;
+  padding: 0.875rem;
+  border-radius: 0.75rem;
+  background: #1e3a2f;
+  border: 1px solid #2d5a45;
+  color: #86efac;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.ghost {
+  width: 100%;
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background: transparent;
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+.link {
+  display: block;
+  text-align: center;
+  margin-top: 1.75rem;
+  color: #a78bfa;
+  font-size: 0.9375rem;
+  text-decoration: none;
+}
+
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0;
+}
+
+@media (min-height: 500px) {
+  .modalBackdrop {
+    align-items: center;
+    padding: 1rem;
+  }
+}
+
+.modal {
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow: auto;
+  background: #16161f;
+  border: 1px solid #2d2d3d;
+  border-radius: 1rem 1rem 0 0;
+  padding: 1.25rem;
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.4);
+}
+
+@media (min-height: 500px) {
+  .modal {
+    border-radius: 1rem;
+  }
+}
+
+.modalTitle {
+  margin: 0 0 0.75rem;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.modalHint {
+  margin: 0 0 1rem;
+  font-size: 0.8125rem;
+  color: #94a3b8;
+  line-height: 1.45;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 12rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid #2d2d3d;
+  background: #0f0f14;
+  color: #e2e8f0;
+  font-size: 0.9375rem;
+  font-family: inherit;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.importMsg {
+  margin: 0.75rem 0 0;
+  font-size: 0.8125rem;
+  color: #86efac;
+  line-height: 1.4;
+}
+
+.modalActions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  justify-content: flex-end;
+}
+
+.modalCancel {
+  padding: 0.65rem 1.1rem;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.modalAdd {
+  padding: 0.65rem 1.25rem;
+  border-radius: 0.5rem;
+  background: #7c3aed;
+  color: #fff;
+  font-weight: 700;
+}

@@ -1,0 +1,58 @@
+.page {
+  padding: 1.5rem 1.25rem 2rem;
+}
+
+.title {
+  margin: 0 0 1.25rem;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.section {
+  margin: 1rem 0 0.5rem;
+  font-size: 0.875rem;
+  color: #94a3b8;
+}
+
+.value {
+  margin: 0 0 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #a78bfa;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.chip {
+  padding: 0.625rem 1rem;
+  background: #1a1a24;
+  border: 1px solid #2d2d3d;
+  border-radius: 0.625rem;
+  color: #e2e8f0;
+  font-size: 0.9375rem;
+}
+
+.chipOn {
+  border-color: #7c3aed;
+  background: #2d2640;
+}
+
+.note {
+  margin-top: 1.5rem;
+  font-size: 0.75rem;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+.back {
+  display: inline-block;
+  margin-top: 2rem;
+  color: #a78bfa;
+  text-decoration: none;
+  font-size: 1rem;
+}

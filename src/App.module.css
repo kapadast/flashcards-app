@@ -1,0 +1,23 @@
+.shell {
+  min-height: 100dvh;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  padding: 0;
+  background: #0f0f14;
+}
+
+.frame {
+  width: 100%;
+  max-width: 480px;
+  min-height: 100dvh;
+  margin: 0 auto;
+  background: #0f0f14;
+  box-shadow: 0 0 0 1px #1f1f2e;
+}
+
+.muted {
+  text-align: center;
+  color: #64748b;
+  padding: 2rem;
+}
