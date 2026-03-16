@@ -107,7 +107,7 @@ export function HomePage(props: Props) {
     navigate("/study", { state: { session } });
   }, [wordsSessionIds, navigate]);
 
-  const runImportWords = () => {
+  const runImportWords = async () => {
     setImportWordsMsg(null);
     const baseLookup = buildBaseLookup(baseWords);
     const existingNorm = new Set<string>();
@@ -139,10 +139,12 @@ export function HomePage(props: Props) {
     );
     setImportWordsText("");
 
-    // Синхронизируем кастомные слова в облако
     if (user) {
-      const allCustom = loadCustomEntries();
-      syncCustomWordsToCloud(user.id, allCustom).catch(() => null);
+      const allCustomWords = loadCustomEntries();
+      await syncCustomWordsToCloud(user.id, allCustomWords).catch((err) => {
+        console.error("syncCustomWordsToCloud failed:", err);
+      });
+      console.log("Synced words to cloud:", allCustomWords.length);
     }
   };
 
@@ -157,7 +159,7 @@ export function HomePage(props: Props) {
     });
   };
 
-  const runImportPhrases = (categoryId: string, categoryName: string) => {
+  const runImportPhrases = async (categoryId: string, categoryName: string) => {
     setImportPhraseMsg(null);
     const rows = parsePhraseImport(importPhraseText);
     if (rows.length === 0) {
@@ -169,10 +171,12 @@ export function HomePage(props: Props) {
     setImportPhraseText("");
     refreshCategories();
 
-    // Синхронизируем фразы в облако
     if (user) {
       const allPhrases = loadPhraseEntries(categoryId);
-      syncCustomPhrasesToCloud(user.id, allPhrases, categoryId).catch(() => null);
+      await syncCustomPhrasesToCloud(user.id, allPhrases, categoryId).catch((err) => {
+        console.error("syncCustomPhrasesToCloud failed:", err);
+      });
+      console.log("Synced phrases to cloud:", allPhrases.length, "categoryId:", categoryId);
     }
   };
 
