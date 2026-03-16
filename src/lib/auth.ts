@@ -1,9 +1,11 @@
 import { supabase } from './supabase'
 
-export function signInWithGoogle() {
-  return supabase.auth.signInWithOAuth({
+export const signInWithGoogle = async () => {
+  await supabase.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: window.location.origin },
+    options: {
+      redirectTo: 'https://lighthearted-halva-64feb9.netlify.app',
+    },
   })
 }
 
