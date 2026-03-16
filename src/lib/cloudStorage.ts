@@ -13,12 +13,12 @@ import {
   loadPhraseProgressMap,
   savePhraseProgressMap,
   loadPhraseCategories,
+  addPhraseCategory,
 } from './phraseStorage'
 
 // ── user_progress ──────────────────────────────────────────────────────────
-// columns: user_id, card_id, category_id, interval, ease_factor, next_review, repetitions
-// unique constraint: (user_id, card_id, category_id)
-// category_id = '' для слов, реальный id категории для фраз
+// columns: user_id, card_id, interval, ease_factor, next_review, repetitions
+// unique constraint: (user_id, card_id). Синхронизируем только прогресс слов.
 
 const KEY_CATEGORIES = '@flashcards_phrase_categories_v1'
 
@@ -27,32 +27,30 @@ export async function syncProgressToCloud(
   progress: Map<number, CardProgress>,
   categoryId = ''
 ): Promise<void> {
+  if (categoryId !== '') return
   const rows = [...progress.values()].map((c) => ({
     user_id: userId,
     card_id: c.id,
-    category_id: categoryId,
     interval: c.interval,
     ease_factor: c.easeFactor,
     next_review: c.nextReview,
     repetitions: c.repetitions ?? 0,
   }))
   if (rows.length === 0) return
-  console.log('[cloudStorage] syncProgressToCloud', { userId, categoryId, count: rows.length })
+  console.log('[cloudStorage] syncProgressToCloud', { userId, count: rows.length })
   await supabase
     .from('user_progress')
-    .upsert(rows, { onConflict: 'user_id,card_id,category_id' })
+    .upsert(rows, { onConflict: 'user_id,card_id' })
 }
 
 export async function loadProgressFromCloud(
-  userId: string,
-  categoryId = ''
+  userId: string
 ): Promise<Pick<CardProgress, 'id' | 'interval' | 'easeFactor' | 'nextReview' | 'repetitions'>[]> {
   const { data } = await supabase
     .from('user_progress')
     .select('card_id,interval,ease_factor,next_review,repetitions')
     .eq('user_id', userId)
-    .eq('category_id', categoryId)
-  console.log('[cloudStorage] loadProgressFromCloud', { userId, categoryId, count: data?.length ?? 0 })
+  console.log('[cloudStorage] loadProgressFromCloud', { userId, count: data?.length ?? 0 })
   if (!data) return []
   return data.map((r) => ({
     id: r.card_id as number,
@@ -64,8 +62,8 @@ export async function loadProgressFromCloud(
 }
 
 // ── custom_words ──────────────────────────────────────────────────────────
-// columns: user_id, word_id, word, translation, example
-// unique constraint: (user_id, word_id)
+// columns: user_id, card_id, word, translation, example
+// unique constraint: (user_id, card_id)
 
 export async function syncCustomWordsToCloud(
   userId: string,
@@ -74,7 +72,7 @@ export async function syncCustomWordsToCloud(
   if (words.length === 0) return
   const rows = words.map((w) => ({
     user_id: userId,
-    word_id: w.id,
+    card_id: w.id,
     word: w.word,
     translation: w.translation,
     example: w.example ?? '',
@@ -82,18 +80,18 @@ export async function syncCustomWordsToCloud(
   console.log('[cloudStorage] syncCustomWordsToCloud', { userId, count: rows.length })
   await supabase
     .from('custom_words')
-    .upsert(rows, { onConflict: 'user_id,word_id' })
+    .upsert(rows, { onConflict: 'user_id,card_id' })
 }
 
 export async function loadCustomWordsFromCloud(userId: string): Promise<WordEntry[]> {
   const { data } = await supabase
     .from('custom_words')
-    .select('word_id,word,translation,example')
+    .select('card_id,word,translation,example')
     .eq('user_id', userId)
   console.log('[cloudStorage] loadCustomWordsFromCloud', { userId, count: data?.length ?? 0 })
   if (!data) return []
   return data.map((r) => ({
-    id: r.word_id as number,
+    id: r.card_id as number,
     word: r.word as string,
     translation: r.translation as string,
     example: (r.example as string) ?? '',
@@ -101,8 +99,8 @@ export async function loadCustomWordsFromCloud(userId: string): Promise<WordEntr
 }
 
 // ── custom_phrases ────────────────────────────────────────────────────────
-// columns: user_id, phrase_id, phrase, translation, category_id, category_name
-// unique constraint: (user_id, phrase_id, category_id)
+// columns: user_id, card_id, phrase, translation, category
+// unique constraint: (user_id, card_id)
 
 export async function syncCustomPhrasesToCloud(
   userId: string,
@@ -112,16 +110,15 @@ export async function syncCustomPhrasesToCloud(
   if (phrases.length === 0) return
   const rows = phrases.map((p) => ({
     user_id: userId,
-    phrase_id: p.id,
+    card_id: p.id,
     phrase: p.phrase,
     translation: p.translation,
-    category_id: categoryId,
-    category_name: p.category,
+    category: p.category,
   }))
   console.log('[cloudStorage] syncCustomPhrasesToCloud', { userId, categoryId, count: rows.length })
   await supabase
     .from('custom_phrases')
-    .upsert(rows, { onConflict: 'user_id,phrase_id,category_id' })
+    .upsert(rows, { onConflict: 'user_id,card_id' })
 }
 
 export async function loadCustomPhrasesFromCloud(
@@ -129,16 +126,16 @@ export async function loadCustomPhrasesFromCloud(
 ): Promise<Array<PhraseEntry & { categoryId: string }>> {
   const { data } = await supabase
     .from('custom_phrases')
-    .select('phrase_id,phrase,translation,category_id,category_name')
+    .select('card_id,phrase,translation,category')
     .eq('user_id', userId)
   console.log('[cloudStorage] loadCustomPhrasesFromCloud', { userId, count: data?.length ?? 0 })
   if (!data) return []
   return data.map((r) => ({
-    id: r.phrase_id as number,
+    id: r.card_id as number,
     phrase: r.phrase as string,
     translation: r.translation as string,
-    category: r.category_name as string,
-    categoryId: r.category_id as string,
+    category: (r.category as string) ?? '',
+    categoryId: (r.category as string) ?? '',
   }))
 }
 
@@ -163,7 +160,7 @@ export async function mergeAndLoadFromCloud(
 }
 
 async function mergeWordProgress(userId: string, baseWords: WordEntry[]): Promise<void> {
-  const cloudRows = await loadProgressFromCloud(userId, '')
+  const cloudRows = await loadProgressFromCloud(userId)
   if (cloudRows.length === 0) {
     console.log('[cloudStorage] mergeWordProgress: no cloud progress')
     return
@@ -221,42 +218,32 @@ async function mergePhraseData(userId: string): Promise<void> {
     return
   }
 
-  // Уникальные категории из облака (id, name)
-  const cloudCats = new Map<string, string>()
+  // В таблице только category (имя). Группируем по имени.
+  const byCategoryName = new Map<string, Array<PhraseEntry & { categoryId: string }>>()
   for (const p of cloudPhrases) {
-    if (!cloudCats.has(p.categoryId)) cloudCats.set(p.categoryId, p.category)
-  }
-  // Добавляем недостающие категории в localStorage (@flashcards_phrase_categories_v1)
-  let userCats: Array<{ id: string; name: string }> = []
-  try {
-    const raw = localStorage.getItem(KEY_CATEGORIES)
-    if (raw) {
-      const arr = JSON.parse(raw) as Array<{ id: string; name: string }>
-      if (Array.isArray(arr)) userCats = arr.filter((c) => c?.id && c?.name)
-    }
-  } catch {
-    /* ignore */
-  }
-  const existingIds = new Set(userCats.map((c) => c.id))
-  for (const [catId, name] of cloudCats) {
-    if (!existingIds.has(catId)) {
-      userCats.push({ id: catId, name })
-      existingIds.add(catId)
-    }
-  }
-  if (userCats.length > 0) {
-    localStorage.setItem(KEY_CATEGORIES, JSON.stringify(userCats))
-    console.log('[cloudStorage] mergePhraseData: categories saved', { count: userCats.length })
+    const key = p.category || ''
+    const arr = byCategoryName.get(key) ?? []
+    arr.push(p)
+    byCategoryName.set(key, arr)
   }
 
-  // Группируем фразы по категории и сохраняем в @flashcards_phrases_${categoryId}
-  const byCat = new Map<string, Array<PhraseEntry & { categoryId: string }>>()
-  for (const p of cloudPhrases) {
-    const arr = byCat.get(p.categoryId) ?? []
-    arr.push(p)
-    byCat.set(p.categoryId, arr)
-  }
-  for (const [catId, phrases] of byCat) {
+  const categories = loadPhraseCategories()
+  for (const [categoryName, phrases] of byCategoryName) {
+    if (!categoryName) continue
+    const existing = categories.find((c) => c.name === categoryName)
+    let catId: string
+    if (existing) {
+      catId = existing.id
+    } else {
+      const added = addPhraseCategory(categoryName)
+      catId = added.id
+      categories.push(added)
+      const raw = localStorage.getItem(KEY_CATEGORIES)
+      let userCats: Array<{ id: string; name: string }> = raw ? (JSON.parse(raw) as Array<{ id: string; name: string }>) : []
+      if (!Array.isArray(userCats)) userCats = []
+      userCats.push({ id: added.id, name: added.name })
+      localStorage.setItem(KEY_CATEGORIES, JSON.stringify(userCats))
+    }
     const localPhrases = loadPhraseEntries(catId)
     const localIds = new Set(localPhrases.map((p) => p.id))
     const toAdd = phrases.filter((p) => !localIds.has(p.id))
@@ -265,39 +252,6 @@ async function mergePhraseData(userId: string): Promise<void> {
       ...toAdd.map((p) => ({ id: p.id, phrase: p.phrase, translation: p.translation, category: p.category })),
     ]
     savePhraseEntries(catId, merged)
-    console.log('[cloudStorage] mergePhraseData: phrases saved', { categoryId: catId, added: toAdd.length, total: merged.length })
-  }
-
-  // Мёржим прогресс по фразам
-  const categories = loadPhraseCategories()
-  for (const cat of categories) {
-    const cloudRows = await loadProgressFromCloud(userId, cat.id)
-    if (cloudRows.length === 0) continue
-
-    const localRaw = localStorage.getItem(`@flashcards_phrases_progress_${cat.id}`)
-    const localArr: CardProgress[] = localRaw ? (JSON.parse(localRaw) as CardProgress[]) : []
-    const localById = new Map(localArr.map((c) => [c.id, c]))
-
-    for (const cr of cloudRows) {
-      const local = localById.get(cr.id)
-      if (!local || (cr.repetitions ?? 0) > (local.repetitions ?? 0)) {
-        localById.set(cr.id, {
-          id: cr.id,
-          word: local?.word ?? '',
-          translation: local?.translation ?? '',
-          example: local?.example ?? '',
-          interval: cr.interval,
-          easeFactor: cr.easeFactor,
-          nextReview: cr.nextReview,
-          repetitions: cr.repetitions,
-        })
-      }
-    }
-    localStorage.setItem(
-      `@flashcards_phrases_progress_${cat.id}`,
-      JSON.stringify([...localById.values()])
-    )
-    const freshMap = loadPhraseProgressMap(cat.id)
-    savePhraseProgressMap(cat.id, freshMap)
+    console.log('[cloudStorage] mergePhraseData: phrases saved', { categoryName, categoryId: catId, added: toAdd.length, total: merged.length })
   }
 }
