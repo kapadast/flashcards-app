@@ -5,6 +5,7 @@ import wordsData from "./data/words.json";
 import type { WordEntry, CardProgress } from "./types/card";
 import { loadProgress, saveProgress } from "./lib/storage";
 import { loadSettings, saveSettings, type AppSettings } from "./lib/settings";
+import { supabase } from "./lib/supabase";
 import { getSession, onAuthStateChange } from "./lib/auth";
 import { mergeAndLoadFromCloud, syncProgressToCloud } from "./lib/cloudStorage";
 import { HomePage } from "./pages/HomePage";
@@ -72,6 +73,11 @@ export default function App() {
     setProgressWords(loadProgress(words));
     setSettings(loadSettings());
 
+    // Отладка: сессия при загрузке (v2 хранит в sb-{project-ref}-auth-token)
+    supabase.auth.getSession().then(({ data, error }) => {
+      console.log("Session on load:", data.session, error);
+    });
+
     // Шаг 1: читаем сессию из localStorage + обрабатываем hash после OAuth-редиректа
     getSession().then(({ data: { session } }) => {
       const sessionUser = session?.user ?? null;
@@ -90,15 +96,17 @@ export default function App() {
     });
 
     // Шаг 2: слушаем последующие изменения (выход, рефреш токена и т.д.)
-    const { data: sub } = onAuthStateChange(async (event, session) => {
+    const { data: sub } = onAuthStateChange((event, session) => {
+      console.log("Auth event:", event, session?.user?.email);
       const newUser = session?.user ?? null;
       setUser(newUser);
 
       if (newUser && event === "SIGNED_IN") {
-        await mergeAndLoadFromCloud(newUser.id, words);
-        const freshMap = loadProgress(words);
-        setProgressWords(freshMap);
-        syncProgressToCloud(newUser.id, freshMap).catch(() => null);
+        void mergeAndLoadFromCloud(newUser.id, words).then(() => {
+          const freshMap = loadProgress(words);
+          setProgressWords(freshMap);
+          syncProgressToCloud(newUser.id, freshMap).catch(() => null);
+        });
       }
 
       if (event === "SIGNED_OUT") {
