@@ -2,6 +2,52 @@
   padding: 1.5rem 1.25rem 2rem;
 }
 
+/* ── Auth bar ── */
+.authBar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.625rem;
+  margin-bottom: 1rem;
+  min-height: 2.25rem;
+}
+
+.authEmail {
+  font-size: 0.8125rem;
+  color: #94a3b8;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 180px;
+}
+
+.authBtn {
+  padding: 0.4rem 0.875rem;
+  border-radius: 0.5rem;
+  background: transparent;
+  border: 1px solid #2d2d3d;
+  color: #94a3b8;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.authBtnGoogle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.875rem;
+  border-radius: 0.5rem;
+  background: #1a1a24;
+  border: 1px solid #2d2d3d;
+  color: #e2e8f0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
 .title {
   margin: 0.5rem 0 0;
   font-size: 1.75rem;

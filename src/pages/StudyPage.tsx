@@ -9,6 +9,7 @@ import {
 } from "../lib/phraseStorage";
 import { speakWord } from "../lib/speech";
 import type { AppSettings } from "../lib/settings";
+import { syncProgressToCloud } from "../lib/cloudStorage";
 import styles from "./StudyPage.module.css";
 
 type Props =
@@ -20,6 +21,7 @@ type Props =
         React.SetStateAction<Map<number, CardProgress>>
       >;
       settings: AppSettings;
+      userId: string | null;
       onDone: () => void;
     }
   | {
@@ -27,6 +29,7 @@ type Props =
       categoryId: string;
       ids: number[];
       settings: AppSettings;
+      userId: string | null;
       onDone: () => void;
     };
 
@@ -64,13 +67,21 @@ export function StudyPage(props: Props) {
       const updated = applySm2(card, q);
       const m = new Map(progress);
       m.set(card.id, updated);
+
       if (props.mode === "words") {
         saveProgress(m);
         props.setProgress(m);
+        if (props.userId) {
+          syncProgressToCloud(props.userId, m).catch(() => null);
+        }
       } else {
         savePhraseProgressMap(props.categoryId, m);
         setPhraseMap(m);
+        if (props.userId) {
+          syncProgressToCloud(props.userId, m, props.categoryId).catch(() => null);
+        }
       }
+
       if (index + 1 >= props.ids.length) {
         props.onDone();
         navigate("/");
@@ -97,8 +108,14 @@ export function StudyPage(props: Props) {
   const endSession = () => {
     if (props.mode === "words") {
       saveProgress(progress);
+      if (props.userId) {
+        syncProgressToCloud(props.userId, progress).catch(() => null);
+      }
     } else {
       savePhraseProgressMap(props.categoryId, progress);
+      if (props.userId) {
+        syncProgressToCloud(props.userId, progress, props.categoryId).catch(() => null);
+      }
     }
     props.onDone();
     navigate("/");
