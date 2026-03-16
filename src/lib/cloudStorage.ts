@@ -62,7 +62,7 @@ export async function loadProgressFromCloud(
 }
 
 // ── custom_words ──────────────────────────────────────────────────────────
-// columns: user_id, card_id, word, translation, example
+// columns: id (uuid), user_id, card_id (text), word, translation (без example)
 // unique constraint: (user_id, card_id)
 
 export async function syncCustomWordsToCloud(
@@ -72,10 +72,9 @@ export async function syncCustomWordsToCloud(
   if (words.length === 0) return
   const rows = words.map((w) => ({
     user_id: userId,
-    card_id: w.id,
+    card_id: String(w.id),
     word: w.word,
     translation: w.translation,
-    example: w.example ?? '',
   }))
   console.log('[cloudStorage] syncCustomWordsToCloud', { userId, count: rows.length })
   await supabase
@@ -86,15 +85,15 @@ export async function syncCustomWordsToCloud(
 export async function loadCustomWordsFromCloud(userId: string): Promise<WordEntry[]> {
   const { data } = await supabase
     .from('custom_words')
-    .select('card_id,word,translation,example')
+    .select('card_id,word,translation')
     .eq('user_id', userId)
   console.log('[cloudStorage] loadCustomWordsFromCloud', { userId, count: data?.length ?? 0 })
   if (!data) return []
   return data.map((r) => ({
-    id: r.card_id as number,
+    id: Number(r.card_id),
     word: r.word as string,
     translation: r.translation as string,
-    example: (r.example as string) ?? '',
+    example: '',
   }))
 }
 
